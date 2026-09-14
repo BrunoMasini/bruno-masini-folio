@@ -307,7 +307,7 @@ export function PortfolioPage() {
               </div>
               <Accordion type="single" collapsible defaultValue="nitro" className="border-t border-border">
                 {experiences.map((item, index) => (
-                  <AccordionItem key={item.company} value={item.company.toLowerCase().split(" ")[0]} className="relative pl-8 sm:pl-12">
+                  <AccordionItem key={item.company} value={item.company.toLowerCase().split(" ")[0] ?? item.company} className="relative pl-8 sm:pl-12">
                     <span className="absolute left-0 top-8 size-3 rounded-full border-2 border-primary bg-background" />
                     {index < experiences.length - 1 && <span className="absolute bottom-0 left-[5px] top-11 w-px bg-border" />}
                     <AccordionTrigger className="py-7 hover:no-underline">
