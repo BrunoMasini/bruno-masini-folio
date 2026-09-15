@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, LoaderCircle, LockKeyhole, LogOut } from "lucide-react";
+import { ArrowLeft, LoaderCircle, LockKeyhole, LogOut, Mail } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/site-content.functions";
+
+const ADMIN_EMAIL = "fradmasini@gmail.com";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -30,6 +32,8 @@ function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [isSendingLink, setIsSendingLink] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -62,6 +66,7 @@ function AdminPage() {
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setNotice("");
     setIsLoading(true);
 
     const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
@@ -85,6 +90,51 @@ function AdminPage() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function sendFirstAccessLink() {
+    setError("");
+    setNotice("");
+    setIsSendingLink(true);
+
+    const { error: linkError } = await supabase.auth.signInWithOtp({
+      email: ADMIN_EMAIL,
+      options: {
+        emailRedirectTo: `${window.location.origin}/reset-password`,
+        shouldCreateUser: true,
+      },
+    });
+
+    setIsSendingLink(false);
+    if (linkError) {
+      setError("Não foi possível enviar o link agora. Aguarde alguns minutos e tente novamente.");
+      return;
+    }
+
+    setNotice(`Link enviado para ${ADMIN_EMAIL}. Verifique também a pasta de spam.`);
+  }
+
+  async function sendRecoveryLink() {
+    setError("");
+    setNotice("");
+
+    if (email.trim().toLowerCase() !== ADMIN_EMAIL) {
+      setError("Informe o e-mail administrativo autorizado.");
+      return;
+    }
+
+    setIsSendingLink(true);
+    const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(ADMIN_EMAIL, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setIsSendingLink(false);
+
+    if (recoveryError) {
+      setError("Não foi possível enviar o link agora. Aguarde alguns minutos e tente novamente.");
+      return;
+    }
+
+    setNotice(`Link de recuperação enviado para ${ADMIN_EMAIL}.`);
   }
 
   async function handleLogout() {
@@ -160,11 +210,34 @@ function AdminPage() {
             />
           </label>
           {error ? <p className="text-sm text-destructive" role="alert">{error}</p> : null}
+          {notice ? <p className="text-sm text-primary" role="status">{notice}</p> : null}
           <Button className="h-11 w-full" type="submit" disabled={isLoading}>
             {isLoading ? <LoaderCircle className="size-4 animate-spin" /> : <LockKeyhole className="size-4" />}
             Entrar
           </Button>
         </form>
+
+        <div className="mt-5 border-t border-border pt-5">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 w-full"
+            onClick={sendFirstAccessLink}
+            disabled={isSendingLink}
+          >
+            {isSendingLink ? <LoaderCircle className="size-4 animate-spin" /> : <Mail className="size-4" />}
+            Enviar link de primeiro acesso
+          </Button>
+          <Button
+            type="button"
+            variant="link"
+            className="mt-2 w-full"
+            onClick={sendRecoveryLink}
+            disabled={isSendingLink}
+          >
+            Esqueci minha senha
+          </Button>
+        </div>
 
         <Button asChild variant="ghost" className="mt-4 w-full">
           <Link to="/"><ArrowLeft className="size-4" /> Voltar ao portfólio</Link>

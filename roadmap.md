@@ -4,3 +4,6 @@
 - [x] Construir conteúdo e navegação do portfólio
 - [x] Adicionar timeline expansível e animações acessíveis
 - [x] Validar visual e funcionamento em desktop e celular
+- [x] Criar primeiro acesso administrativo por link enviado ao e-mail autorizado
+- [x] Adicionar definição e recuperação segura de senha administrativa
+- [x] Testar o fluxo administrativo em computador e celular
