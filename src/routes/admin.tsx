@@ -27,7 +27,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminPage() {
   const verifyAdmin = useServerFn(checkIsAdmin);
-  const [email, setEmail] = useState("");
+  const [email] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -97,12 +97,8 @@ function AdminPage() {
     setNotice("");
     setIsSendingLink(true);
 
-    const { error: linkError } = await supabase.auth.signInWithOtp({
-      email: ADMIN_EMAIL,
-      options: {
-        emailRedirectTo: `${window.location.origin}/reset-password`,
-        shouldCreateUser: true,
-      },
+    const { error: linkError } = await supabase.auth.resetPasswordForEmail(ADMIN_EMAIL, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     setIsSendingLink(false);
@@ -111,7 +107,7 @@ function AdminPage() {
       return;
     }
 
-    setNotice(`Link enviado para ${ADMIN_EMAIL}. Verifique também a pasta de spam.`);
+    setNotice(`Link para definir sua senha enviado para ${ADMIN_EMAIL}. Verifique também a pasta de spam.`);
   }
 
   async function sendRecoveryLink() {
@@ -140,7 +136,6 @@ function AdminPage() {
   async function handleLogout() {
     await supabase.auth.signOut();
     setIsAdmin(false);
-    setEmail("");
     setPassword("");
   }
 
@@ -194,7 +189,7 @@ function AdminPage() {
               type="email"
               autoComplete="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              readOnly
               required
             />
           </label>
@@ -226,7 +221,7 @@ function AdminPage() {
             disabled={isSendingLink}
           >
             {isSendingLink ? <LoaderCircle className="size-4 animate-spin" /> : <Mail className="size-4" />}
-            Enviar link de primeiro acesso
+            Enviar link para definir senha
           </Button>
           <Button
             type="button"

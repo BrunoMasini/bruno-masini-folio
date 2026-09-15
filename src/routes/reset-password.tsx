@@ -33,24 +33,39 @@ function ResetPasswordPage() {
 
   useEffect(() => {
     let active = true;
+    let recoveryConfirmed = false;
+
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const queryParams = new URLSearchParams(window.location.search);
+    const recoveryInUrl = hashParams.get("type") === "recovery" || queryParams.get("type") === "recovery";
+
+    function acceptRecoverySession(session: Parameters<Parameters<typeof supabase.auth.onAuthStateChange>[0]>[1]) {
+      if (!active || !session) return;
+      recoveryConfirmed = true;
+      setHasSession(true);
+      setError("");
+      setIsChecking(false);
+    }
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") acceptRecoverySession(session);
+    });
 
     async function checkSession() {
       const { data, error: sessionError } = await supabase.auth.getSession();
       if (!active) return;
-      setHasSession(Boolean(data.session));
-      if (sessionError || !data.session) {
-        setError("Este link é inválido ou expirou. Solicite um novo link na área administrativa.");
+      if (data.session && recoveryInUrl) {
+        acceptRecoverySession(data.session);
+        return;
       }
-      setIsChecking(false);
+      if (!recoveryConfirmed) {
+        setHasSession(false);
+        setError("Este link é inválido ou expirou. Solicite um novo link na área administrativa.");
+        setIsChecking(false);
+      }
     }
 
     void checkSession();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!active || !session) return;
-      setHasSession(true);
-      setError("");
-      setIsChecking(false);
-    });
 
     return () => {
       active = false;
@@ -73,13 +88,15 @@ function ResetPasswordPage() {
 
     setIsSaving(true);
     const { error: updateError } = await supabase.auth.updateUser({ password });
-    setIsSaving(false);
 
     if (updateError) {
+      setIsSaving(false);
       setError("Não foi possível definir a senha. Solicite um novo link e tente novamente.");
       return;
     }
 
+    await supabase.auth.signOut();
+    setIsSaving(false);
     setIsComplete(true);
   }
 
