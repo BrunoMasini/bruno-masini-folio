@@ -202,6 +202,7 @@ export const defaultContent: SiteContent = {
       },
     ],
     certifications: [
+      "Claude AI · Hashtag Treinamentos · Emitida em set de 2026",
       "Artificial Intelligence Executive",
       "AI & Automation Enterprise with n8n · Flowgrammers",
       "Introduction to Cybersecurity",
