@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, KeyRound, LoaderCircle, ShieldAlert } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 
@@ -22,7 +22,6 @@ export const Route = createFileRoute("/reset-password")({
 });
 
 function ResetPasswordPage() {
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [isChecking, setIsChecking] = useState(true);
@@ -87,17 +86,30 @@ function ResetPasswordPage() {
     }
 
     setIsSaving(true);
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({ password });
 
-    if (updateError) {
+      if (updateError) {
+        setError("Não foi possível definir a senha. Solicite um novo link e tente novamente.");
+        return;
+      }
+
+      setIsComplete(true);
+      setPassword("");
+      setConfirmation("");
+
+      // A sessão do link é temporária. O encerramento não deve impedir a
+      // confirmação visual caso o navegador já a tenha invalidado.
+      try {
+        await supabase.auth.signOut({ scope: "local" });
+      } catch {
+        // A senha já foi salva; o administrador pode seguir para o login.
+      }
+    } catch {
+      setError("Não foi possível concluir a definição da senha. Solicite um novo link e tente novamente.");
+    } finally {
       setIsSaving(false);
-      setError("Não foi possível definir a senha. Solicite um novo link e tente novamente.");
-      return;
     }
-
-    await supabase.auth.signOut();
-    setIsSaving(false);
-    setIsComplete(true);
   }
 
   if (isChecking) {
@@ -117,8 +129,8 @@ function ResetPasswordPage() {
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Seu acesso administrativo está pronto. Entre com seu e-mail e a nova senha.
           </p>
-          <Button className="mt-7 h-11 w-full" onClick={() => navigate({ to: "/admin" })}>
-            Ir para o login
+          <Button asChild className="mt-7 h-11 w-full">
+            <Link to="/admin">Ir para o login</Link>
           </Button>
         </section>
       </main>
