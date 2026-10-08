@@ -202,6 +202,10 @@ export const defaultContent: SiteContent = {
       },
     ],
     certifications: [
+      "Formação de Claude AI · Viver de IA",
+      "Formação de LOVABLE AI · Viver de IA",
+      "Google AI Professional Certicate are fluent in AI · Coursera",
+      "Google Ads for Beginners · Coursera",
       "Claude AI · Hashtag Treinamentos · Emitida em set de 2026",
       "Artificial Intelligence Executive",
       "AI & Automation Enterprise with n8n · Flowgrammers",
