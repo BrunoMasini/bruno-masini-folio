@@ -57,10 +57,10 @@ export const defaultContent: SiteContent = {
     firstName: "Bruno",
     lastName: "Masini",
     summary:
-      "Mais de 14 anos transformando desafios de infraestrutura, operações e ambientes Microsoft em soluções confiáveis — hoje ampliadas por automação, nuvem e Inteligência Artificial.",
+      "Mais de 15 anos transformando desafios de infraestrutura, operações e ambientes Microsoft em soluções confiáveis — hoje ampliadas por automação, nuvem e Inteligência Artificial.",
     photoUrl: brunoPhoto.url,
     photoAlt: "Retrato executivo de Bruno Masini",
-    badgeNumber: "14+",
+    badgeNumber: "15+",
     badgeLabel: "anos em tecnologia",
   },
   skills: {
@@ -194,6 +194,11 @@ export const defaultContent: SiteContent = {
         eyebrow: "Em andamento · 2025—2027",
         title: "Mestrado em Gestão de Projetos de TI",
         subtitle: "Centro Universitário FAM",
+      },
+      {
+        eyebrow: "Em andamento",
+        title: "Cibersegurança do Zero à Prática",
+        subtitle: "Digital Innovation One · Santander Open Academy",
       },
       {
         eyebrow: "Graduação",

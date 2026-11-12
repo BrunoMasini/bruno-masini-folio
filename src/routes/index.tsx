@@ -5,7 +5,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Bruno Masini | Senior IT Analyst" },
-      { name: "description", content: "Portfólio de Bruno Masini, Senior IT Analyst com mais de 14 anos em infraestrutura, nuvem, automação e IA." },
+      { name: "description", content: "Portfólio de Bruno Masini, Senior IT Analyst com mais de 15 anos em infraestrutura, nuvem, automação e IA." },
       { property: "og:title", content: "Bruno Masini | Senior IT Analyst" },
       { property: "og:description", content: "Experiência em infraestrutura, operações de TI, Microsoft, automação e Inteligência Artificial." },
       { property: "og:type", content: "website" },
